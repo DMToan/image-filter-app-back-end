@@ -35,19 +35,25 @@ app.use(bodyParser.json());
 app.get("/filteredimage", async (req, res) => {
   const image_url = req.query.image_url;
   const isImageURL = validateImageUrl(image_url);
-  let localImagePath = '';
   if (isImageURL) {
-    localImagePath = await filterImageFromURL(image_url);
+    const localImagePath = await filterImageFromURL(image_url);
+    
+    res.sendFile(localImagePath, () => {
+      deleteLocalFiles([localImagePath]);
+    });
+  } else {
+    res.redirect("/400")
   }
-  res.sendFile(localImagePath, () => {
-    deleteLocalFiles([localImagePath]);
-  });
 });
 // Displays a simple message to the user
 app.get("/", async (req, res) => {
   res.send("try GET /filteredimage?image_url={{}}")
 });
 
+// invalid URL
+app.get("/400", async (req, res) => {
+  res.send("invalid image URL")
+});
 
 // Start the Server
 app.listen(port, () => {
