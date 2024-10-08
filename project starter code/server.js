@@ -37,22 +37,17 @@ app.get("/filteredimage", async (req, res) => {
   const isImageURL = validateImageUrl(image_url);
   if (isImageURL) {
     const localImagePath = await filterImageFromURL(image_url);
-    
+
     res.sendFile(localImagePath, () => {
       deleteLocalFiles([localImagePath]);
     });
   } else {
-    res.redirect("/400")
+    res.status(422).send({ message: "Unprocessable Entity" });
   }
 });
 // Displays a simple message to the user
 app.get("/", async (req, res) => {
   res.send("try GET /filteredimage?image_url={{}}")
-});
-
-// invalid URL
-app.get("/400", async (req, res) => {
-  res.send("invalid image URL")
 });
 
 // Start the Server
